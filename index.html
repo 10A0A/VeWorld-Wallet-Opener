@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open VeWorld Wallet</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <button onclick="openVeWorld()">Open VeWorld Wallet</button>
+        <p id="status"></p>
+    </div>
+
+    <script>
+        async function openVeWorld() {
+            const status = document.getElementById('status');
+            status.textContent = 'Attempting to open VeWorld...';
+
+            try {
+                // Check if VeWorld is available
+                if (window.vechain) {
+                    // VeWorld injects a 'window.vechain' API
+                    // Attempt to establish a connection
+                    const result = await window.vechain.request({
+                        method: 'eth_requestAccounts' // Standard Web3 method for connecting
+                    });
+                    status.textContent = 'VeWorld connected: ' + JSON.stringify(result);
+                } else {
+                    // Fallback: Check if another Web3 API is available
+                    if (window.ethereum) {
+                        // Attempt to connect via window.ethereum
+                        const accounts = await window.ethereum.request({
+                            method: 'eth_requestAccounts'
+                        });
+                        status.textContent = 'Wallet connected: ' + JSON.stringify(accounts);
+                    } else {
+                        status.textContent = 'VeWorld or a compatible wallet is not installed.';
+                    }
+                }
+            } catch (error) {
+                status.textContent = 'Error: ' + error.message;
+                console.error('Error opening VeWorld:', error);
+            }
+        }
+    </script>
+</body>
+</html>
